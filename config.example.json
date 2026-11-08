@@ -1,0 +1,9 @@
+{
+  "subdomain": "suaempresa",
+  "client_id": "COLE_AQUI_O_ID_DA_INTEGRACAO",
+  "client_secret": "COLE_AQUI_A_CHAVE_SECRETA",
+  "redirect_uri": "https://localhost",
+  "access_token": "",
+  "refresh_token": "",
+  "expires_at": 0
+}
