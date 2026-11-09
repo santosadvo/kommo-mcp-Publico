@@ -1,7 +1,10 @@
-"""Cliente HTTP do Kommo com OAuth2 e auto-refresh de token.
+"""Cliente HTTP do Kommo.
 
-Gerencia leitura/gravacao de credenciais em config.json e renova o
-access_token automaticamente usando o refresh_token quando ele expira.
+Le as credenciais de config.json. Funciona de dois jeitos:
+- token de longa duracao (gravado pelo token_longo.py): usado ate vencer;
+  quando vence, o erro explica como gerar outro;
+- OAuth2 (gravado pelo auth.py): o access_token e renovado sozinho com o
+  refresh_token quando expira.
 """
 
 from __future__ import annotations
@@ -42,6 +45,13 @@ def _base_url(cfg: dict[str, Any]) -> str:
 
 def _refresh_access_token(cfg: dict[str, Any]) -> dict[str, Any]:
     """Troca o refresh_token por um novo access_token e grava no config."""
+    if cfg.get("long_lived"):
+        vence = time.strftime("%d/%m/%Y", time.localtime(int(cfg.get("expires_at", 0)) + 120))
+        raise KommoConfigError(
+            f"O token de longa duracao venceu ou foi revogado (validade: {vence}). "
+            "Gere outro na integracao do Kommo (aba 'Chaves e escopos') e rode "
+            "'uv run python token_longo.py'."
+        )
     if not cfg.get("refresh_token"):
         raise KommoConfigError(
             "Sem refresh_token. Rode 'uv run python auth.py' para autenticar."
